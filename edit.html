@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Data</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Protest Riot:wght@400;500;600;700&display=swap">
+    <style>
+        body{
+    font-family: "Protest Riot";
+}
+    </style>
+</head>
+
+<body>
+    <h1 class="text-center mt-5">Edit Data</h1>
+    <div id="edit-form" class="w-50 m-auto d-flex justify-content-center border border-secondary rounded-3">
+        <!-- Edit form will be inserted here -->
+    </div>
+
+    <script>
+        function fetchItemDetails(id) {
+            // Fetch item details from the API using the item ID
+            fetch(`https://65cc5a54dd519126b83e4e51.mockapi.io/Register/${id}`)
+                .then(response => response.json())
+                .then(item => {
+                    // Create an edit form with input fields pre-filled with the item details
+                    const editForm = document.createElement('form');
+                    editForm.innerHTML = `
+                    <div  class="col-6 my-2 input-all">
+                    <label class="py-2" for="fName">First Name :</label>
+                    <input type="text" id="fName" name="fName" value="${item.fName}"  class="control border border-dark rounded"  required> 
+                    <div class="error"></div>
+                </div>
+                <div class="col-6 my-2 input-all">
+                    <label class="py-2" for="lName">Last Name :</label>
+                    <input type="text" id="lName" name="lName" value="${item.lName}" class="control border border-dark rounded" required >
+                    <div  class="error"></div>        
+                </div>
+                <div class="col-6 my-2 input-all">
+                    <label class="py-2" for="email">Email :</label>
+                    <input type="email" id="email" name="email" value="${item.email}" class="control border border-dark rounded" required >
+                    <div  class="error"></div>        
+                </div>
+                <div class="col-6 my-2 input-all">
+                    <label class="py-2" for="password">Password :</label>
+                    <input type="password" id="password" name="password" value="${item.password}" class="control border border-dark rounded"  required>
+                    <div class="error"></div>
+                </div>
+                <div class='d-flex justify-content-end m-3'>
+                    <button type="button" class='btn btn-sm btn-warning' onclick="updateItem(${item.id})">Update</button>
+                </div>
+      `;
+                    document.getElementById('edit-form').appendChild(editForm);
+                })
+                .catch(error => {
+                    console.error('Error fetching item details:', error);
+                });
+        }
+
+        // Function to update item data
+        function updateItem(id) {
+            // Get the new name entered by the user
+            const newfName = document.getElementById('fName').value;
+            const newlName = document.getElementById('lName').value;
+            const newEmail = document.getElementById('email').value;
+            const newPassword = document.getElementById('password').value;
+
+            // Update the item data on the server
+            fetch(`https://65cc5a54dd519126b83e4e51.mockapi.io/Register/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                     fName: newfName, 
+                     lName: newlName,
+                     email: newEmail,
+                     password: newPassword
+                    })
+            })
+                .then(response => response.json())
+                .then(updatedItem => {
+                    alert('Item updated successfully');
+                    // Redirect back to the index page after updating the item
+                    window.location.href = 'list.html';
+                })
+                .catch(error => {
+                    console.error('Error updating item:', error);
+                    alert('Error updating item. Please try again.');
+                });
+        }
+
+        // Get item ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        
+        // Fetch and display item details
+        if (id) {
+            fetchItemDetails(id);
+        } else {
+            console.error('Item ID not found in URL parameter');
+        }
+    </script>
+</body>
+
+</html>
